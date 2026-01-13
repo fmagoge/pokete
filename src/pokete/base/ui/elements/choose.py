@@ -1,5 +1,6 @@
 import scrap_engine as se
 
+from pokete.base.color import Color
 from pokete.base.input import (
     ACTION_DIRECTIONS,
     ACTION_UP_DOWN,
@@ -14,7 +15,7 @@ class BoxIndex(se.Object):
     """Index that can be used in ChooseBox"""
 
     def __init__(self):
-        super().__init__("*", state="float")
+        super().__init__("▶", esccode=Color.thicc + Color.yellow, state="float")
         self.index: int = 0
 
 

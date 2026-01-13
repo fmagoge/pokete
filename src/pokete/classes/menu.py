@@ -4,6 +4,7 @@ from typing import Never, Optional
 
 import scrap_engine as se
 
+from pokete.base.color import Color
 from pokete.base.context import Context
 from pokete.base.ui.elements import InfoBox
 from pokete.base.ui.notify import notifier
@@ -18,28 +19,48 @@ from .settings import Slider, TextInputBox, VisSetting, settings
 from .side_loops import About
 
 
+class MenuSeparator(se.Text):
+    """Visual separator for menu sections"""
+
+    def __init__(self, label=""):
+        separator = f"──┤ {label} ├" + "─" * (20 - len(label))
+        super().__init__(separator, esccode=Color.grey, state="float")
+
+
+class MenuAction(se.Text):
+    """Styled menu action label"""
+
+    def __init__(self, text, color=Color.white):
+        super().__init__(text, esccode=color, state="float")
+
+
 class Menu(ChooseBoxView):
     def __init__(self):
         super().__init__(50, 35, "Menu")
         self.playername_input = TextInputBox("Playername:", 17)
         self.represent_char_input = TextInputBox("Char:", 1)
-        self.mods_label = se.Text("Mods", state="float")
-        self.ach_label = se.Text("Achievements", state="float")
-        self.about_label = se.Text("About", state="float")
-        self.save_label = se.Text("Save", state="float")
-        self.exit_label = se.Text("Exit", state="float")
+        self.mods_label = MenuAction("Mods", Color.lightblue)
+        self.ach_label = MenuAction("Achievements", Color.yellow)
+        self.about_label = MenuAction("About", Color.cyan)
+        self.save_label = MenuAction("Save", Color.green)
+        self.exit_label = MenuAction("Exit", Color.red)
         self.elems = [
+            MenuSeparator("Profile"),
             self.playername_input,
             self.represent_char_input,
+            MenuSeparator("Settings"),
             VisSetting("Autosave", "autosave", {True: "On", False: "Off"}),
             VisSetting("Animations", "animations", {True: "On", False: "Off"}),
             VisSetting(
                 "Save trainers", "save_trainers", {True: "On", False: "Off"}
             ),
+            MenuSeparator("Audio"),
             VisSetting("Audio", "audio", {True: "On", False: "Off"}),
             Slider("Volume", "volume"),
+            MenuSeparator("Mods"),
             VisSetting("Load mods", "load_mods", {True: "On", False: "Off"}),
             self.mods_label,
+            MenuSeparator("Actions"),
             self.ach_label,
             self.about_label,
             self.save_label,
@@ -51,6 +72,9 @@ class Menu(ChooseBoxView):
 
     def choose(self, ctx: Context, idx: int) -> Optional[Never]:
         i = self.c_obs[self.index.index]
+        # Skip separators - they're not selectable
+        if isinstance(i, MenuSeparator):
+            return
         audio_before = settings("audio").val
         volume_before = settings("volume").val
         if i == self.playername_input:

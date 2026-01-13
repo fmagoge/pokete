@@ -2,6 +2,7 @@ from typing import Optional
 
 import scrap_engine as se
 
+from pokete.base.color import Color
 from pokete.base.game_map import CompatMap
 
 from ...context import Context
@@ -36,12 +37,18 @@ class Box(se.Box, Overview):
         self.inner = se.Square(
             char=" ", width=width - 2, height=height - 2, state="float"
         )
-        self.name_label = se.Text(name, state="float")
-        self.info_label = se.Text(info, state="float")
+        # Styled title with decorations
+        styled_name = f"╸{name}╺" if name else ""
+        self.name_label = se.Text(
+            styled_name, esccode=Color.thicc + Color.cyan, state="float"
+        )
+        self.info_label = se.Text(
+            info, esccode=Color.lightgrey, state="float"
+        )
         # adding
         self.add_ob(self.frame, 0, 0)
         self.add_ob(self.inner, 1, 1)
-        self.add_ob(self.name_label, 2, 0)
+        self.add_ob(self.name_label, 1, 0)
         self.add_ob(self.info_label, 2, self.height - 1)
 
     def resize_view(self):

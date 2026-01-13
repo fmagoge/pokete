@@ -51,13 +51,14 @@ class Slider(se.Box, Overview, MouseInteractor):
         self.overview: Overview
         self.setting = settings(setting)
         self.text = se.Text(text + ":", state="float")
-        self.slider = SliderCursor("<o>", state="float")
-        self.left = se.Object("[", state="float")
-        self.right = se.Object("]", state="float")
+        self.slider = SliderCursor("◆", esccode=Color.thicc + Color.white, state="float")
+        self.left = se.Object("┠", esccode=Color.grey, state="float")
+        self.right = se.Object("┨", esccode=Color.grey, state="float")
+        # Gradient from green (high) through yellow to red (low)
         self.line = (
-            se.Text(6 * "#", esccode=Color.green, state="float")
-            + se.Text(7 * "#", esccode=Color.yellow, state="float")
-            + se.Text(6 * "#", esccode=Color.red, state="float")
+            se.Text(6 * "━", esccode=Color.green, state="float")
+            + se.Text(7 * "━", esccode=Color.yellow, state="float")
+            + se.Text(6 * "━", esccode=Color.red, state="float")
         )
         self.boundary = self.line.width - 1
         self.add_ob(self.text, 0, 0)
@@ -147,14 +148,20 @@ class VisSetting(se.Text):
         self.setting = settings(setting)
         self.index = list(options).index(self.setting.val)
         super().__init__(
-            text + ": " + self.options[self.setting.val], state="float"
+            self._format_text(), state="float"
         )
+
+    def _format_text(self):
+        """Format the setting text with colored value"""
+        val = self.options[self.setting.val]
+        val_color = Color.green if val == "On" else Color.red if val == "Off" else ""
+        return f"{self.name}: {val_color}{val}{Color.reset}"
 
     def change(self, ctx: Context):
         """Change the setting"""
         self.index = (self.index + 1) % len(self.options)
         self.setting.val = list(self.options)[self.index]
-        self.rechar(self.name + ": " + self.options[self.setting.val])
+        self.rechar(self._format_text())
         logging.info(
             "[Setting][%s] set to %s", self.setting.name, self.setting.val
         )
@@ -204,8 +211,8 @@ class TextInputBox(se.Box):
     def __init__(self, label: str, max_len: int):
         super().__init__(1, len(label) + 1 + max_len)
         self.max_len = max_len
-        self.label = se.Text(label, state="float")
-        self.value = se.Text("", state="float")
+        self.label = se.Text(label, esccode=Color.lightgrey, state="float")
+        self.value = se.Text("", esccode=Color.thicc + Color.white, state="float")
         self.add_ob(self.label, 0, 0)
         self.add_ob(self.value, len(label) + 1, 0)
 
