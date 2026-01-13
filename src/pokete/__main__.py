@@ -426,6 +426,7 @@ def intro(ctx: Context):
             "Name",
             17,
         )
+    ctx.figure.rechar(ctx.figure.name[0])
     mvp.movemap.name_label_rechar(ctx.figure.name)
     mvp.movemap.text(
         ctx,
